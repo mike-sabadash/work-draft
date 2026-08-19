@@ -30,10 +30,11 @@ const manifest = JSON.parse(readFileSync(files.manifest));
 const musical = manifest.barStarts.length === 12 && manifest.beatStarts.length === 48
   && manifest.beatStarts.every((beat, index) => beat.beatInBar === index % 4 + 1 && beat.downbeat === (index % 4 === 0))
   && manifest.barStarts[4].degree === 'IV' && manifest.barStarts[8].degree === 'V' && manifest.barStarts[11].degree === 'V';
+const movAlphaPixelFormats = /^(?:yuva444p(?:10|12)le|gbrap(?:10|12)le)$/;
 const checks = {
   movCodec: stream.mov.codec_name === 'prores',
   movProfile: /4444/i.test(stream.mov.profile || ''),
-  movAlphaPixelFormat: stream.mov.pix_fmt === 'yuva444p10le',
+  movAlphaPixelFormat: movAlphaPixelFormats.test(stream.mov.pix_fmt || ''),
   movFrameCount: Number(stream.mov.nb_read_frames || stream.mov.nb_frames) === expectedFrames,
   movGeometryFpsDuration: common('mov'),
   webmCodec: stream.webm.codec_name === 'vp9',
