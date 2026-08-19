@@ -1,0 +1,3 @@
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+body { display: grid; place-items: center; }
+canvas { width: min(100vw, 56.25vh); height: min(177.777vw, 100vh); display: block; background: transparent; }
