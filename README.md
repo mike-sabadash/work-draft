@@ -4,10 +4,10 @@
 
 ## Экспорт
 
-Требуются Node.js 20+, FFmpeg/FFprobe и Playwright Chromium.
+Требуются Node.js 22, FFmpeg/FFprobe и Playwright Chromium.
 
 ```bash
-npm install
+npm ci
 npx playwright install chromium
 npm run export
 npm run verify
@@ -15,7 +15,7 @@ npm run verify
 
 Или откройте вкладку **Actions**, выберите workflow **Render 12-bar blues overlay**, нажмите **Run workflow**, а после успешного завершения скачайте артефакт `12-bar-blues-115bpm-render` со страницы запуска.
 
-Экспорт создаёт ProRes 4444 MOV с `yuva444p10le`, VP9 WebM с `yuva420p`, MP4-превью на фоне `#11151b` и три контрольных PNG в `dist/`. Ближайшее целое число кадров для 115 BPM — 1503, поэтому контейнер длится 25.050000 с (музыкальная длительность 25.0434782609 с; отклонение одного кадра неизбежно и составляет 0.0065217391 с). Все границы тактов остаются привязаны к точным значениям `bar * 240 / BPM`.
+Экспорт создаёт в `dist/` ProRes 4444 MOV с `yuva444p10le`, VP9 WebM с alpha metadata, MP4-превью на фоне `#11151b`, контрольные PNG `control-bar-01-start.png`, `control-bar-05-mid.png`, `control-bar-09-turnaround.png` и два JSON-отчёта. Первые два видео и PNG прозрачны. Ближайшее не обрезающее музыку целое число кадров для 115 BPM — 1503, поэтому контейнер длится 25.050000 с (музыкальная длительность 25.0434782609 с; отклонение составляет 0.0065217391 с). Все границы тактов вычисляются из абсолютных значений `bar * 240 / BPM`, без накопления округлений.
 
 ## Изменение BPM
 

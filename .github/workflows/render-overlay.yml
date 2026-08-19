@@ -2,6 +2,9 @@ name: Render 12-bar blues overlay
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -45,9 +48,9 @@ jobs:
           test -s dist/12-bar-blues-115bpm-alpha.mov
           test -s dist/12-bar-blues-115bpm-alpha.webm
           test -s dist/12-bar-blues-115bpm-preview.mp4
-          test -s dist/control-start.png
+          test -s dist/control-bar-01-start.png
           test -s dist/control-bar-05-mid.png
-          test -s dist/control-turnaround.png
+          test -s dist/control-bar-09-turnaround.png
           test -s dist/render-manifest.json
           test -s dist/verification-report.json
 
