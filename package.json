@@ -1,0 +1,13 @@
+{
+  "name": "twelve-bar-blues-overlay",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preview": "python3 -m http.server 8000",
+    "export": "node scripts/export.mjs",
+    "verify": "node scripts/verify.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0"
+  }
+}

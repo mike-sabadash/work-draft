@@ -1,0 +1,60 @@
+name: Render 12-bar blues overlay
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    name: Render and verify video exports
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      BPM: '115'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Install FFmpeg and ffprobe
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Render overlay exports
+        run: npm run export
+
+      - name: Verify exports
+        run: npm run verify
+
+      - name: Require every deliverable
+        run: |
+          test -s dist/12-bar-blues-115bpm-alpha.mov
+          test -s dist/12-bar-blues-115bpm-alpha.webm
+          test -s dist/12-bar-blues-115bpm-preview.mp4
+          test -s dist/control-start.png
+          test -s dist/control-bar-05-mid.png
+          test -s dist/control-turnaround.png
+          test -s dist/render-manifest.json
+          test -s dist/verification-report.json
+
+      - name: Upload rendered videos and reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: 12-bar-blues-115bpm-render
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
