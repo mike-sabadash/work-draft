@@ -7,6 +7,7 @@ export const frameCount = Math.round(duration * CONFIG.fps);
 
 const COLORS = { I: '#506b82', IV: '#c66f52', V: '#d7a62f' };
 const LABELS = ['PHRASE 01', 'PHRASE 02', 'TURNAROUND'];
+const SUBLABELS = ['TONIC · I — I — I — I', 'MOVE TO IV · IV — IV — I — I', 'V — IV — I — V'];
 const canvas = document.querySelector('#overlay');
 const ctx = canvas.getContext('2d', { alpha: true });
 
@@ -26,7 +27,7 @@ export function stateAtTime(rawTime) {
   const timeInBar = time - barIndex * barDuration;
   const beatIndex = Math.floor(time / beatDuration);
   const beatInBar = beatIndex % 4;
-  const beatPosition = time % beatDuration;
+  const beatPosition = time - beatIndex * beatDuration;
   return { time, barIndex, timeInBar, beatIndex, beatInBar, beatPosition, degree: FORM[barIndex] };
 }
 
@@ -46,23 +47,26 @@ export function renderAtTime(timeInSeconds) {
   ctx.shadowBlur = 10 + flash * 32; ctx.globalAlpha = .2 + flash * .8;
   ctx.beginPath(); ctx.arc(130, headerY + 3, (downbeat ? 10 : 8) + flash * (downbeat ? 8 : 5), 0, Math.PI * 2); ctx.fill(); ctx.restore();
 
-  const left = 130, gap = 12, totalW = 820, segmentW = (totalW - gap * 3) / 4;
+  const left = 130, totalW = 820, segmentW = totalW / 4;
   const trackY = [690, 990, 1290], trackH = 98;
   for (let row = 0; row < 3; row++) {
     text(LABELS[row], left, trackY[row] - 64, 22, 700, 'left', .68);
+    text(SUBLABELS[row], left, trackY[row] - 31, 15, 600, 'left', .52, COLORS[FORM[row * 4]]);
     for (let column = 0; column < 4; column++) {
-      const index = row * 4 + column, x = left + column * (segmentW + gap), degree = FORM[index];
-      ctx.fillStyle = '#c8d0d5'; ctx.globalAlpha = .11; roundedRect(x, trackY[row], segmentW, trackH, 9);
+      const index = row * 4 + column, x = left + column * segmentW, degree = FORM[index];
+      ctx.save(); ctx.beginPath(); ctx.roundRect(left, trackY[row], totalW, trackH, 12); ctx.clip();
+      ctx.fillStyle = COLORS[degree]; ctx.globalAlpha = .13; ctx.fillRect(x, trackY[row], segmentW, trackH); ctx.restore();
       let progress = 0, alpha = .18;
       if (index < s.barIndex) { progress = 1; alpha = .48; }
       else if (index === s.barIndex) { progress = s.timeInBar / barDuration; alpha = 1; }
       if (progress > 0) {
-        ctx.save(); ctx.beginPath(); ctx.roundRect(x, trackY[row], segmentW, trackH, 9); ctx.clip();
+        ctx.save(); ctx.beginPath(); ctx.roundRect(left, trackY[row], totalW, trackH, 12); ctx.clip();
         ctx.fillStyle = COLORS[degree]; ctx.globalAlpha = alpha; ctx.fillRect(x, trackY[row], segmentW * progress, trackH); ctx.restore();
       }
       ctx.globalAlpha = index === s.barIndex ? 1 : index < s.barIndex ? .58 : .32;
       text(degree, x + segmentW / 2, trackY[row] + trackH / 2 + 1, 39, 700, 'center', ctx.globalAlpha);
       text(String(index + 1).padStart(2, '0'), x + 10, trackY[row] + trackH + 28, 15, 600, 'left', .34);
+      if (column > 0) { ctx.fillStyle = '#eef1ed'; ctx.globalAlpha = .18; ctx.fillRect(x - 1, trackY[row] + 12, 2, trackH - 24); }
     }
   }
   ctx.globalAlpha = 1;
